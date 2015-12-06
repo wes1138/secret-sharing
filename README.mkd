@@ -72,7 +72,7 @@ Examples
 	```
 
 **NOTE:** information theoretic sharing is substantially more costly in
-computation as well as memory footprint.  For large files use:
+computation as well as memory footprint.  For large files use `aes-share.sh`.
 
 Known / Potential Issues
 ------------------------
