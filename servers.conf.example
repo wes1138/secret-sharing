@@ -1,0 +1,11 @@
+# servers.conf.example
+# Copy this file to servers.conf and edit appropriately.
+# NOTE: these can be any source / destination folders that
+# scp would understand.  For example:
+
+servers=( "me@example.com:shares/"
+          "sshprofile:shares/"
+          "/mnt/externalhdd/shares/"
+          "/mnt/usbstick/shares/" )
+
+# vim:syntax=sh

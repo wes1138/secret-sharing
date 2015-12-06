@@ -1,0 +1,90 @@
+Secret Sharing
+==============
+
+Synopsis
+--------
+
+Information theoretic and computational secret sharing schemes.
+
+Dependencies
+------------
+
+* [NTL]
+* [OpenSSL] (for computational scheme)
+* [xxd] (for computational scheme)
+* [OpenSSH] (for `scp` to transfer shares)
+
+
+Examples
+--------
+
+
+### Computationally-secure sharing
+
+* Generate 5 shares of `file.jpg`, requiring 3 to reconstruct:
+
+	```bash
+    $ ./aes-share.sh -l -n 5 -t 3 file.jpg
+	# /tmp/file.jpg.enc <-- aes encryption of file.jpg with random key
+	# /tmp/shares-XXXXXX/{1..5} <-- info theoretic shares of the key
+	```
+
+* Reconstruct `file.jpg` from shares:
+
+	```bash
+    $ ./aes-share.sh -r /tmp/file.jpg.enc /tmp/shares-XXXXXX/* > recon.jpg
+	# NOTE: encrypted file must be the first argument, followed by shares.
+	```
+
+* Generate shares and push to configured servers (see `servers.conf.example`)
+
+	```bash
+    $ ./aes-share.sh file.jpg
+	file.jpg.enc                   100%   29KB  29.1KB/s   00:00
+	1                              100%   53     0.1KB/s   00:00
+	file.jpg.enc                   100%   29KB  29.1KB/s   00:00
+	2                              100%   53     0.1KB/s   00:00
+	file.jpg.enc                   100%   29KB  29.1KB/s   00:00
+	3                              100%   53     0.1KB/s   00:00
+	```
+
+* Pull shares from configured server, reconstruct, make sure it is the same:
+
+	```bash
+    $ ./aes-share.sh -r file.jpg | sha1sum
+	7036d8f73f3a919d499f1a6ff6d393e3e41fa67e  -
+	$ sha1sum file.jpg
+	7036d8f73f3a919d499f1a6ff6d393e3e41fa67e  file.jpg
+	```
+
+### Information-theoretic sharing
+
+* Generate 5 shares of `~/file`, requiring 3 to reconstruct:
+
+	```bash
+    $ ./sshare -n 5 -t 3 ~/file
+	```
+
+* Reconstruct ~/file from shares in /tmp/shares/{1..3} and read in pager:
+
+	```bash
+    $ ./sshare /tmp/shares/{1..3} | less
+	```
+
+**NOTE:** information theoretic sharing is substantially more costly in
+computation as well as memory footprint.  For large files use:
+
+Known / Potential Issues
+------------------------
+
+* The `openssl` invocation will contain the random key in the command line,
+  and so would be momentarily visible in a process listing.
+* Memory footprint of information theoretic sharing could be reduced in a
+  number of ways (but to make it genuinely small would be difficult).
+* Would be nice to add means other than scp for transferring shares.
+
+
+[NTL]: http://www.shoup.net/ntl/
+[OpenSSL]: https://www.openssl.org/
+[xxd]: https://github.com/vim/vim
+[OpenSSH]: http://www.openssh.com/
